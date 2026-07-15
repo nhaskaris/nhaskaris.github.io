@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated Tab Name -->
     <title>Nick Haskaris</title>
     
+    <!-- Import Google Font for a clean, high-tech retro feel -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="icon" href="data:,">
 
@@ -22,6 +24,7 @@
             margin: 0;
             padding: 0;
             background-color: var(--dark-bg);
+            /* Radial glow in the background */
             background-image: radial-gradient(circle at center, #0f0f1b 0%, #050508 100%);
             overflow: hidden;
             font-family: 'Share Tech Mono', monospace;
@@ -32,6 +35,7 @@
             height: 100vh;
         }
 
+        /* Modern, centered canvas with a neon glass glow */
         canvas {
             display: block;
             border: 2px solid var(--border-color);
@@ -80,6 +84,7 @@
             color: #cbd5e1;
         }
 
+        /* Retro Neon Button */
         .modal button {
             background-color: transparent;
             border: 2px solid white;
@@ -119,6 +124,7 @@
             50% { opacity: 0.6; }
         }
 
+        /* Footer hints outside the game frame */
         .footer-hint {
             margin-top: 15px;
             font-size: 0.9rem;
@@ -160,6 +166,7 @@
 
             let selectedIndex = 1; // Default to the middle "Projects" door
             let modalActive = false;
+            let canInput = true; // Prevents the double-trigger space close loop
 
             // Simple instructions drawing
             k.add([
@@ -168,6 +175,29 @@
                 k.anchor("center"),
                 k.color(90, 90, 115)
             ]);
+
+            // Simple helper to synthesize a retro synth beep on navigation
+            function playBeep() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(400, ctx.currentTime); // Retro pitch blip
+                    
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime); // Low volume
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // Quick fade out
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch (e) {
+                    // Fail silently if browser blocks early context
+                }
+            }
 
             // Draw a beautiful pseudo-3D grid floor dynamically
             let gridOffset = 0;
@@ -184,7 +214,7 @@
                     width: 2
                 });
 
-                // 2. Draw 3D Floor Perspective lines radiating from the vanishing point
+                // 2. Draw 3D Floor Perspective lines radiating from vanishing point
                 const numFloorLines = 16;
                 for (let i = 0; i <= numFloorLines; i++) {
                     const progress = i / numFloorLines;
@@ -289,54 +319,32 @@
                 });
             });
 
-            // Simple helper to synthesize a retro synth beep on navigation
-            function playBeep() {
-                try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    
-                    osc.type = "sine";
-                    osc.frequency.setValueAtTime(400, ctx.currentTime); // Quick retro pitch
-                    
-                    gain.gain.setValueAtTime(0.05, ctx.currentTime); // Low volume so it's not loud
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // Quick fade out
-                    
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.1);
-                } catch (e) {
-                    // Fail silently if browser blocks early audio context
-                }
-            }
-
             // Input Selection Controllers
             k.onKeyPress("left", () => {
-                if (modalActive) return;
+                if (modalActive || !canInput) return;
                 selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
-                playBeep(); // FIXED: Uses our native synthesized sound!
+                playBeep(); 
             });
             k.onKeyPress("a", () => {
-                if (modalActive) return;
+                if (modalActive || !canInput) return;
                 selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
                 playBeep();
             });
 
             k.onKeyPress("right", () => {
-                if (modalActive) return;
+                if (modalActive || !canInput) return;
                 selectedIndex = (selectedIndex + 1) % doors.length;
                 playBeep();
             });
             k.onKeyPress("d", () => {
-                if (modalActive) return;
+                if (modalActive || !canInput) return;
                 selectedIndex = (selectedIndex + 1) % doors.length;
                 playBeep();
             });
 
             // Action Trigger logic (Open selected door)
             function openDoor() {
+                if (!canInput) return;
                 const currentDoor = doors[selectedIndex];
                 modalActive = true;
 
@@ -369,23 +377,30 @@
 
             // Bind Spacebar key inside game frame
             k.onKeyPress("space", () => {
-                if (!modalActive) {
+                if (!modalActive && canInput) {
                     openDoor();
-                } else {
-                    closeModal();
                 }
             });
 
-            // Connect window listeners to globally close the modal
+            // Globally accessible function to restore game controls safely
             window.closeModal = function() {
                 document.getElementById("modal").style.display = "none";
                 modalActive = false;
+                canInput = false;
+
+                // 150ms lockout window to prevent immediate re-trigger on space keyup
+                setTimeout(() => {
+                    canInput = true;
+                }, 150);
             }
 
+            // Keyboard Exit Listeners (For both Space and Escape keys)
             window.addEventListener("keydown", (e) => {
-                if (modalActive && (e.key === " " || e.code === "Space" || e.key === "Escape")) {
-                    e.preventDefault();
-                    closeModal();
+                if (modalActive) {
+                    if (e.key === " " || e.code === "Space" || e.key === "Escape") {
+                        e.preventDefault(); // Prevents page scroll
+                        closeModal();
+                    }
                 }
             });
         });
