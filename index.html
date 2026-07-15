@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gamified CV | KAPLAY.js</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121214;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        /* Custom styled game canvas centering */
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 4px solid #323238;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        /* Style for the overlay HTML Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1a1a1e;
+            color: #e1e1e6;
+            border: 3px solid #00ff66;
+            padding: 30px;
+            z-index: 100;
+            box-shadow: 0px 0px 30px rgba(0, 255, 102, 0.4);
+            text-align: center;
+            border-radius: 8px;
+            min-width: 320px;
+        }
+        .modal h2 {
+            margin-top: 0;
+            color: #00ff66;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+        }
+        .modal button {
+            background-color: #00ff66;
+            color: #121214;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .modal button:hover {
+            background-color: #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+        .construction-tag {
+            color: #f1c40f;
+            font-weight: bold;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+    <!-- Import KAPLAY.js library via CDN -->
+    <script src="https://unpkg.com/kaplay@3001.0.12/dist/kaplay.js"></script>
+</head>
+<body>
+
+    <!-- HTML Modals for when the player enters portals -->
+    <div id="modal" class="modal">
+        <h2 id="modal-title">Portal</h2>
+        <p class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</p>
+        <p id="modal-text">Content is being assembled...</p>
+        <button onclick="closeModal()">Return to World (ESC)</button>
+    </div>
+
+    <script>
+        // Initialize KAPLAY
+        const k = kaplay({
+            width: 800,
+            height: 600,
+            background: [18, 18, 20], // Dark charcoal aesthetic [1.2.5]
+            letterbox: true,          // Automatically scales cleanly
+        });
+
+        // 1. Generate retro procedural sprites (No external files required!)
+        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); // Built-in friendly KAPLAY asset [1.1.2]
+        
+        // Let's create visual scenes
+        k.scene("main", () => {
+            // Set simple physics [1.2.5]
+            const SPEED = 250;
+
+            // Simple UI Instruction text inside the game canvas
+            k.add([
+                k.text("Use WASD/Arrows to Move around! Walk into a zone.", { size: 16 }),
+                k.pos(20, 20),
+                k.color(150, 150, 150),
+            ]);
+
+            // Add the Player Entity [1.1.2, 1.2.5]
+            const player = k.add([
+                k.sprite("player"),
+                k.pos(k.center()),
+                k.area(), // Collision box [1.1.2, 1.2.5]
+                k.body(), // Physical behavior [1.1.2, 1.2.5]
+                "player"  // Tag [1.1.2]
+            ]);
+
+            // Setup Portals as physical areas with custom metadata tags
+            const zones = [
+                { title: "Work History", x: 150, y: 150, color: k.rgb(52, 152, 219), tag: "work" },
+                { title: "Projects", x: 650, y: 150, color: k.rgb(155, 89, 182), tag: "projects" },
+                { title: "Contact Info", x: 400, y: 450, color: k.rgb(46, 204, 113), tag: "contact" }
+            ];
+
+            zones.forEach(zone => {
+                // Portal pad
+                k.add([
+                    k.rect(120, 80, { radius: 10 }),
+                    k.pos(zone.x, zone.y),
+                    k.anchor("center"),
+                    k.color(zone.color),
+                    k.area(),
+                    zone.tag
+                ]);
+
+                // Zone text label
+                k.add([
+                    k.text(zone.title, { size: 14 }),
+                    k.pos(zone.x, zone.y - 60),
+                    k.anchor("center"),
+                    k.color(255, 255, 255)
+                ]);
+            ]);
+
+            // 2. Control logic (WASD and Arrows) [1.1.2, 1.2.5]
+            let controlsActive = true;
+
+            k.onKeyDown("left", () => { if(controlsActive) player.move(-SPEED, 0) });
+            k.onKeyDown("a", () => { if(controlsActive) player.move(-SPEED, 0) });
+            
+            k.onKeyDown("right", () => { if(controlsActive) player.move(SPEED, 0) });
+            k.onKeyDown("d", () => { if(controlsActive) player.move(SPEED, 0) });
+            
+            k.onKeyDown("up", () => { if(controlsActive) player.move(0, -SPEED) });
+            k.onKeyDown("w", () => { if(controlsActive) player.move(0, -SPEED) });
+            
+            k.onKeyDown("down", () => { if(controlsActive) player.move(0, SPEED) });
+            k.onKeyDown("s", () => { if(controlsActive) player.move(0, SPEED) });
+
+            // 3. Collision Logic: When the player steps on a portal pad [1.2.5]
+            function triggerPortal(title, description, bounceDirection) {
+                controlsActive = false;
+                
+                // Show standard HTML modal overlay
+                const modal = document.getElementById("modal");
+                document.getElementById("modal-title").innerText = title;
+                document.getElementById("modal-text").innerText = description;
+                modal.style.display = "block";
+
+                // Bounce player slightly backward off the portal
+                player.move(bounceDirection.x, bounceDirection.y);
+            }
+
+            player.onCollide("work", () => {
+                triggerPortal("Work History", "Here is where I'll host my work questline. Expect career leveling, previous employment achievements, and dynamic role stats!", k.vec2(0, 100));
+            });
+
+            player.onCollide("projects", () => {
+                triggerPortal("Projects Showcase", "A display of legendary creations. Git repositories, visual showcases, and real-time live demonstrations will live here.", k.vec2(0, 100));
+            });
+
+            player.onCollide("contact", () => {
+                triggerPortal("Contact & Connect", "Send an encrypted signal or dispatch a carrier pigeon! My email, LinkedIn, and social portals will be linked here.", k.vec2(0, -100));
+            });
+
+            // Make sure the player doesn't fly off the screen
+            player.onUpdate(() => {
+                if (player.pos.x < 0) player.pos.x = 0;
+                if (player.pos.x > k.width() - 40) player.pos.x = k.width() - 40;
+                if (player.pos.y < 0) player.pos.y = 0;
+                if (player.pos.y > k.height() - 40) player.pos.y = k.height() - 40;
+            });
+
+            // Escape key closes modal [1.2.5]
+            k.onKeyPress("escape", () => {
+                closeModal();
+            });
+
+            // Globally accessible function to restore game controls
+            window.closeModal = function() {
+                document.getElementById("modal").style.display = "none";
+                controlsActive = true;
+            }
+        });
+
+        // Start game
+        k.go("main");
+    </script>
+</body>
+</html>
