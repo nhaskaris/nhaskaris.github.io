@@ -1,411 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Updated Tab Name -->
-    <title>Nick Haskaris</title>
-    
-    <!-- Import Google Font for a clean, high-tech retro feel -->
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:,">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nick Haskaris</title>
 
-    <style>
-        :root {
-            --neon-green: #00ff66;
-            --neon-blue: #00e5ff;
-            --neon-purple: #b400ff;
-            --dark-bg: #050508;
-            --card-bg: rgba(15, 15, 20, 0.9);
-            --border-color: #1a1a26;
-        }
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="icon" href="data:," />
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--dark-bg);
-            /* Radial glow in the background */
-            background-image: radial-gradient(circle at center, #0f0f1b 0%, #050508 100%);
-            overflow: hidden;
-            font-family: 'Share Tech Mono', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
+  <style>
+    :root {
+      --neon-green: #00ff66;
+      --neon-blue: #00e5ff;
+      --neon-purple: #b400ff;
+      --dark-bg: #050508;
+      --card-bg: rgba(15, 15, 20, 0.92);
+      --border-color: #1a1a26;
+      --text-dim: #6a6a85;
+    }
 
-        /* Modern, centered canvas with a neon glass glow */
-        canvas {
-            display: block;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 
-                        0 0 30px rgba(0, 229, 255, 0.03);
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        /* Glassmorphic Cyberpunk Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--card-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            color: #f1f1f4;
-            border: 2px solid var(--border-color);
-            padding: 40px;
-            z-index: 100;
-            box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.95);
-            text-align: center;
-            border-radius: 16px;
-            min-width: 360px;
-            max-width: 500px;
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--dark-bg);
+      background-image: radial-gradient(circle at center, #0f0f1b 0%, #050508 100%);
+      overflow: hidden;
+      font-family: "Share Tech Mono", monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 18px;
+    }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translate(-50%, -40%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
+    /* ---------- Title header ---------- */
+    .site-title {
+      font-family: "Orbitron", sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: 6px;
+      color: #f4f4fa;
+      text-transform: uppercase;
+      text-shadow:
+        0 0 8px rgba(0, 229, 255, 0.55),
+        0 0 22px rgba(0, 229, 255, 0.25);
+      margin: 0;
+    }
 
-        .modal h2 {
-            margin-top: 0;
-            font-size: 2rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+    .site-title span {
+      color: var(--neon-blue);
+    }
 
-        .modal p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #cbd5e1;
-        }
+    /* ---------- Game frame ---------- */
+    .frame-wrap {
+      position: relative;
+      border-radius: 14px;
+      padding: 2px;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 229, 255, 0.35),
+        rgba(180, 0, 255, 0.25),
+        rgba(0, 255, 102, 0.25)
+      );
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+    }
 
-        /* Retro Neon Button */
-        .modal button {
-            background-color: transparent;
-            border: 2px solid white;
-            color: white;
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            font-family: inherit;
-            cursor: pointer;
-            margin-top: 25px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.25s ease;
-        }
+    canvas {
+      display: block;
+      border-radius: 12px;
+      background-color: var(--dark-bg);
+    }
 
-        .modal button:hover {
-            background-color: white;
-            color: #0a0a0c;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
+    /* CRT scanline overlay, purely decorative */
+    .scanlines {
+      pointer-events: none;
+      position: absolute;
+      inset: 2px;
+      border-radius: 12px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.035) 0px,
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: overlay;
+    }
 
-        .construction-tag {
-            display: inline-block;
-            background-color: rgba(241, 196, 15, 0.1);
-            border: 1px dashed #f1c40f;
-            color: #f1c40f;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
+    .scanlines::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.75);
+    }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
+    /* ---------- Modal ---------- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--card-bg);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      color: #f1f1f4;
+      border: 2px solid var(--border-color);
+      padding: 40px;
+      z-index: 100;
+      box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.95);
+      text-align: center;
+      border-radius: 16px;
+      min-width: 360px;
+      max-width: 500px;
+      animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        /* Footer hints outside the game frame */
-        .footer-hint {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #3a3a50;
-            letter-spacing: 1px;
-        }
-    </style>
-    <!-- Import KAPLAY.js library via CDN -->
-    <script src="https://unpkg.com/kaplay@3001.0.12/dist/kaplay.js"></script>
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      font-family: "Orbitron", sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .modal p {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: #cbd5e1;
+    }
+
+    .modal button {
+      background-color: transparent;
+      border: 2px solid white;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 25px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.25s ease;
+    }
+
+    .modal button:hover,
+    .modal button:focus-visible {
+      background-color: white;
+      color: #0a0a0c;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      outline: none;
+    }
+
+    .construction-tag {
+      display: inline-block;
+      background-color: rgba(241, 196, 15, 0.1);
+      border: 1px dashed #f1c40f;
+      color: #f1c40f;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .footer-hint {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      letter-spacing: 1.5px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .construction-tag {
+        animation: none;
+      }
+    }
+  </style>
+
+  <script src="https://unpkg.com/kaplay@3001.0.12/dist/kaplay.js" crossorigin="anonymous"></script>
 </head>
 <body>
+  <h1 class="site-title">NICK <span>HASKARIS</span></h1>
 
-    <!-- HTML Modals for when the player enters portals -->
-    <div id="modal" class="modal">
-        <h2 id="modal-title">Portal</h2>
-        <div class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</div>
-        <p id="modal-text">Content is being assembled...</p>
-        <button onclick="closeModal()">Close Door [SPACE]</button>
-    </div>
+  <div class="frame-wrap" id="frame-wrap">
+    <div class="scanlines"></div>
+  </div>
 
-    <div class="footer-hint">NICK HASKARIS // PORTFOLIO 3D ALPHA</div>
+  <div class="footer-hint">PORTFOLIO 3D ALPHA &mdash; USE ARROWS / A·D TO AIM, SPACE TO ENTER</div>
 
-    <script>
-        // Initialize KAPLAY
-        const k = kaplay({
-            width: 800,
-            height: 600,
-            background: "#050508", 
-            letterbox: true,        
+  <!-- Portal content modal -->
+  <div id="modal" class="modal">
+    <h2 id="modal-title">Portal</h2>
+    <div class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</div>
+    <p id="modal-text">Content is being assembled...</p>
+    <button onclick="closeModal()">Close Door [SPACE]</button>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------
+    // Setup
+    // ---------------------------------------------------------------
+    const k = kaplay({
+      width: 800,
+      height: 600,
+      background: "#050508",
+      letterbox: true,
+    });
+
+    // kaplay appends its own canvas to <body> — move it into our styled
+    // frame so the gradient border / scanline overlay sit around it.
+    const frameWrap = document.getElementById("frame-wrap");
+    const gameCanvas = document.querySelector("canvas");
+    if (gameCanvas) {
+      frameWrap.insertBefore(gameCanvas, frameWrap.firstChild);
+    }
+
+    const DOORS = [
+      {
+        id: 0,
+        title: "WORK HISTORY",
+        x: 220,
+        y: 260,
+        w: 90,
+        h: 180,
+        color: k.rgb(0, 229, 255),
+        classColor: "#00e5ff",
+        desc: "Welcome to the career log! This portal will soon compile a list of jobs held, leadership XP earned, and dynamic developer stats.",
+      },
+      {
+        id: 1,
+        title: "PROJECTS",
+        x: 400,
+        y: 260,
+        w: 110,
+        h: 200,
+        color: k.rgb(180, 0, 255),
+        classColor: "#b400ff",
+        desc: "Inside this hub live standard-shattering builds, active GitHub repos, and direct live links to live web designs.",
+      },
+      {
+        id: 2,
+        title: "CONTACT INFO",
+        x: 580,
+        y: 260,
+        w: 90,
+        h: 180,
+        color: k.rgb(0, 255, 102),
+        classColor: "#00ff66",
+        desc: "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.",
+      },
+    ];
+
+    const HORIZON_Y = 260;
+    const SCALE_SELECTED = 1.15;
+    const SCALE_IDLE = 1.0;
+    const SCALE_LERP_SPEED = 10; // higher = snappier
+
+    k.scene("main", () => {
+      let selectedIndex = 1; // default: middle "Projects" door
+      let modalActive = false;
+      let canInput = true; // guards against double-trigger on space keyup
+
+      // current animated scale per door, eased toward its target each frame
+      const doorScale = DOORS.map((d) => (d.id === selectedIndex ? SCALE_SELECTED : SCALE_IDLE));
+
+      let gridOffset = 0;
+
+      // -------------------------------------------------------------
+      // Static instructions text
+      // -------------------------------------------------------------
+      k.add([
+        k.text("USE LEFT/RIGHT ARROWS TO AIM  //  PRESS SPACE TO OPEN DOOR", { size: 13 }),
+        k.pos(k.width() / 2, 40),
+        k.anchor("center"),
+        k.color(90, 90, 115),
+      ]);
+
+      // -------------------------------------------------------------
+      // Audio: short synth blip on navigation
+      // -------------------------------------------------------------
+      function playBeep(freq = 400) {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.04, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start();
+          osc.stop(ctx.currentTime + 0.1);
+        } catch (e) {
+          // Ignore — browser may block audio context before user gesture
+        }
+      }
+
+      // -------------------------------------------------------------
+      // Render loop: pseudo-3D hallway, floor grid, and doors
+      // -------------------------------------------------------------
+      k.onDraw(() => {
+        const screenW = k.width();
+        const screenH = k.height();
+        const dt = k.dt();
+
+        drawHorizon(screenW);
+        drawFloorPerspectiveLines(screenW, screenH);
+        drawFloorScanlines(screenW, screenH, dt);
+        drawHallwayFraming(screenW);
+        drawDoors(dt);
+      });
+
+      function drawHorizon(screenW) {
+        k.drawLine({
+          p1: k.vec2(0, HORIZON_Y),
+          p2: k.vec2(screenW, HORIZON_Y),
+          color: k.rgb(15, 15, 25),
+          width: 2,
         });
+      }
 
-        k.scene("main", () => {
-            // Door Data Map (Simulating perspective x-coords and sizing)
-            const doors = [
-                { id: 0, title: "WORK HISTORY", x: 220, y: 260, w: 90, h: 180, color: k.rgb(0, 229, 255), desc: "Welcome to the career log! This portal will soon compile a list of jobs held, leadership XP earned, and dynamic developer stats.", classColor: "#00e5ff" },
-                { id: 1, title: "PROJECTS", x: 400, y: 260, w: 110, h: 200, color: k.rgb(180, 0, 255), desc: "Inside this hub live standard-shattering builds, active GitHub repos, and direct live links to live web designs.", classColor: "#b400ff" },
-                { id: 2, title: "CONTACT INFO", x: 580, y: 260, w: 90, h: 180, color: k.rgb(0, 255, 102), desc: "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.", classColor: "#00ff66" }
-            ];
+      function drawFloorPerspectiveLines(screenW, screenH) {
+        const numFloorLines = 16;
+        for (let i = 0; i <= numFloorLines; i++) {
+          const progress = i / numFloorLines;
+          const startX = k.lerp(-400, screenW + 400, progress);
+          k.drawLine({
+            p1: k.vec2(400, HORIZON_Y), // vanishing point at horizon center
+            p2: k.vec2(startX, screenH),
+            color: k.rgb(15, 15, 30),
+            width: 1.5,
+          });
+        }
+      }
 
-            let selectedIndex = 1; // Default to the middle "Projects" door
-            let modalActive = false;
-            let canInput = true; // Prevents the double-trigger space close loop
+      function drawFloorScanlines(screenW, screenH, dt) {
+        gridOffset = (gridOffset + dt * 24) % 40;
 
-            // Simple instructions drawing
-            k.add([
-                k.text("USE LEFT/RIGHT ARROWS TO AIM  //  PRESS SPACE TO OPEN DOOR", { size: 13 }),
-                k.pos(k.width() / 2, 40),
-                k.anchor("center"),
-                k.color(90, 90, 115)
-            ]);
+        for (let j = 0; j < 12; j++) {
+          // exponential scaling creates the illusion of receding depth
+          const ratio = Math.pow((j + gridOffset / 40) / 12, 3);
+          const y = HORIZON_Y + ratio * (screenH - HORIZON_Y);
+          const alpha = Math.floor(ratio * 70);
 
-            // Simple helper to synthesize a retro synth beep on navigation
-            function playBeep() {
-                try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    
-                    osc.type = "sine";
-                    osc.frequency.setValueAtTime(400, ctx.currentTime); // Retro pitch blip
-                    
-                    gain.gain.setValueAtTime(0.04, ctx.currentTime); // Low volume
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // Quick fade out
-                    
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.1);
-                } catch (e) {
-                    // Fail silently if browser blocks early context
-                }
-            }
+          k.drawLine({
+            p1: k.vec2(0, y),
+            p2: k.vec2(screenW, y),
+            color: k.rgb(alpha, alpha, alpha + 30),
+            width: 1,
+          });
+        }
+      }
 
-            // Draw a beautiful pseudo-3D grid floor dynamically
-            let gridOffset = 0;
-            k.onDraw(() => {
-                const vanishingY = 260; // Horizon vanishing point
-                const screenW = k.width();
-                const screenH = k.height();
-
-                // 1. Draw Horizon Line
-                k.drawLine({
-                    p1: k.vec2(0, vanishingY),
-                    p2: k.vec2(screenW, vanishingY),
-                    color: k.rgb(15, 15, 25),
-                    width: 2
-                });
-
-                // 2. Draw 3D Floor Perspective lines radiating from vanishing point
-                const numFloorLines = 16;
-                for (let i = 0; i <= numFloorLines; i++) {
-                    const progress = i / numFloorLines;
-                    const startX = k.lerp(-400, screenW + 400, progress); // Fan lines out widely at bottom
-                    k.drawLine({
-                        p1: k.vec2(400, vanishingY), // Vanishing point at exact center of horizon
-                        p2: k.vec2(startX, screenH),
-                        color: k.rgb(15, 15, 30),
-                        width: 1.5
-                    });
-                }
-
-                // 3. Draw Floor Horizontal Lines (moving down to create depth animation)
-                gridOffset += 1;
-                if (gridOffset >= 40) gridOffset = 0;
-
-                for (let j = 0; j < 12; j++) {
-                    // Exponential scaling creates the optical illusion of 3D depth
-                    const ratio = Math.pow((j + (gridOffset / 40)) / 12, 3);
-                    const y = vanishingY + ratio * (screenH - vanishingY);
-                    
-                    // Fade out lines closer to the horizon line
-                    const alpha = Math.floor(ratio * 70);
-                    k.drawLine({
-                        p1: k.vec2(0, y),
-                        p2: k.vec2(screenW, y),
-                        color: k.rgb(alpha, alpha, alpha + 30),
-                        width: 1
-                    });
-                }
-
-                // 4. Draw the Hallway perspective framing lines (Walls and Ceiling structure)
-                k.drawLine({ p1: k.vec2(0, 0), p2: k.vec2(150, vanishingY), color: k.rgb(25, 25, 40), width: 2 });
-                k.drawLine({ p1: k.vec2(screenW, 0), p2: k.vec2(screenW - 150, vanishingY), color: k.rgb(25, 25, 40), width: 2 });
-
-                // 5. Draw the 3D Doors in Real-time based on selection state
-                doors.forEach((door) => {
-                    const isSelected = door.id === selectedIndex;
-                    const scale = isSelected ? 1.15 : 1.0;
-                    const activeW = door.w * scale;
-                    const activeH = door.h * scale;
-
-                    // Glow background panel under doors
-                    k.drawRect({
-                        width: activeW,
-                        height: activeH,
-                        pos: k.vec2(door.x, door.y),
-                        anchor: "bot",
-                        color: isSelected ? door.color : k.rgb(10, 10, 15),
-                        opacity: isSelected ? 0.08 : 0.02,
-                    });
-
-                    // Door Outline
-                    k.drawRect({
-                        width: activeW,
-                        height: activeH,
-                        pos: k.vec2(door.x, door.y),
-                        anchor: "bot",
-                        fill: false,
-                        outline: {
-                            color: isSelected ? door.color : k.rgb(40, 40, 55),
-                            width: isSelected ? 4 : 2
-                        }
-                    });
-
-                    // Door handle detail (adds to the 3D door illusion)
-                    k.drawCircle({
-                        pos: k.vec2(door.x + (activeW/2.8), door.y - (activeH/2)),
-                        radius: isSelected ? 4 : 3,
-                        color: isSelected ? door.color : k.rgb(50, 50, 60),
-                    });
-
-                    // Label above the door
-                    if (isSelected) {
-                        k.drawText({
-                            text: `[ ${door.title} ]`,
-                            pos: k.vec2(door.x, door.y - activeH - 25),
-                            anchor: "center",
-                            size: 16,
-                            color: door.color
-                        });
-
-                        // Pulsing entry arrow pointing down at selected door
-                        const bounce = Math.sin(k.time() * 8) * 5;
-                        k.drawText({
-                            text: "▼",
-                            pos: k.vec2(door.x, door.y - activeH - 45 + bounce),
-                            anchor: "center",
-                            size: 14,
-                            color: door.color
-                        });
-                    } else {
-                        // Dim labels for inactive doors
-                        k.drawText({
-                            text: door.title,
-                            pos: k.vec2(door.x, door.y - activeH - 15),
-                            anchor: "center",
-                            size: 11,
-                            color: k.rgb(100, 100, 120)
-                        });
-                    }
-                });
-            });
-
-            // Input Selection Controllers
-            k.onKeyPress("left", () => {
-                if (modalActive || !canInput) return;
-                selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
-                playBeep(); 
-            });
-            k.onKeyPress("a", () => {
-                if (modalActive || !canInput) return;
-                selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
-                playBeep();
-            });
-
-            k.onKeyPress("right", () => {
-                if (modalActive || !canInput) return;
-                selectedIndex = (selectedIndex + 1) % doors.length;
-                playBeep();
-            });
-            k.onKeyPress("d", () => {
-                if (modalActive || !canInput) return;
-                selectedIndex = (selectedIndex + 1) % doors.length;
-                playBeep();
-            });
-
-            // Action Trigger logic (Open selected door)
-            function openDoor() {
-                if (!canInput) return;
-                const currentDoor = doors[selectedIndex];
-                modalActive = true;
-
-                // Configure modern themed Modal
-                const modal = document.getElementById("modal");
-                const titleNode = document.getElementById("modal-title");
-                
-                titleNode.innerText = currentDoor.title;
-                titleNode.style.color = currentDoor.classColor;
-                titleNode.style.textShadow = `0 0 15px ${currentDoor.classColor}`;
-                
-                document.getElementById("modal-text").innerText = currentDoor.desc;
-                
-                const btn = modal.querySelector("button");
-                btn.style.borderColor = currentDoor.classColor;
-                btn.style.color = currentDoor.classColor;
-                
-                // Add hover style effect override dynamically
-                btn.onmouseenter = () => {
-                    btn.style.backgroundColor = currentDoor.classColor;
-                    btn.style.color = "#050508";
-                };
-                btn.onmouseleave = () => {
-                    btn.style.backgroundColor = "transparent";
-                    btn.style.color = currentDoor.classColor;
-                };
-
-                modal.style.display = "block";
-            }
-
-            // Bind Spacebar key inside game frame
-            k.onKeyPress("space", () => {
-                if (!modalActive && canInput) {
-                    openDoor();
-                }
-            });
-
-            // Globally accessible function to restore game controls safely
-            window.closeModal = function() {
-                document.getElementById("modal").style.display = "none";
-                modalActive = false;
-                canInput = false;
-
-                // 150ms lockout window to prevent immediate re-trigger on space keyup
-                setTimeout(() => {
-                    canInput = true;
-                }, 150);
-            }
-
-            // Keyboard Exit Listeners (For both Space and Escape keys)
-            window.addEventListener("keydown", (e) => {
-                if (modalActive) {
-                    if (e.key === " " || e.code === "Space" || e.key === "Escape") {
-                        e.preventDefault(); // Prevents page scroll
-                        closeModal();
-                    }
-                }
-            });
+      function drawHallwayFraming(screenW) {
+        k.drawLine({ p1: k.vec2(0, 0), p2: k.vec2(150, HORIZON_Y), color: k.rgb(25, 25, 40), width: 2 });
+        k.drawLine({
+          p1: k.vec2(screenW, 0),
+          p2: k.vec2(screenW - 150, HORIZON_Y),
+          color: k.rgb(25, 25, 40),
+          width: 2,
         });
+      }
 
-        k.go("main");
-    </script>
+      function drawDoors(dt) {
+        DOORS.forEach((door) => {
+          const isSelected = door.id === selectedIndex;
+          const target = isSelected ? SCALE_SELECTED : SCALE_IDLE;
+
+          // smoothly ease current scale toward its target instead of snapping
+          doorScale[door.id] = k.lerp(doorScale[door.id], target, Math.min(1, dt * SCALE_LERP_SPEED));
+
+          const scale = doorScale[door.id];
+          const activeW = door.w * scale;
+          const activeH = door.h * scale;
+
+          // glow panel behind the door
+          k.drawRect({
+            width: activeW,
+            height: activeH,
+            pos: k.vec2(door.x, door.y),
+            anchor: "bot",
+            color: isSelected ? door.color : k.rgb(10, 10, 15),
+            opacity: isSelected ? 0.08 : 0.02,
+          });
+
+          // door outline
+          k.drawRect({
+            width: activeW,
+            height: activeH,
+            pos: k.vec2(door.x, door.y),
+            anchor: "bot",
+            fill: false,
+            outline: {
+              color: isSelected ? door.color : k.rgb(40, 40, 55),
+              width: isSelected ? 4 : 2,
+            },
+          });
+
+          // door handle
+          k.drawCircle({
+            pos: k.vec2(door.x + activeW / 2.8, door.y - activeH / 2),
+            radius: isSelected ? 4 : 3,
+            color: isSelected ? door.color : k.rgb(50, 50, 60),
+          });
+
+          // label
+          if (isSelected) {
+            k.drawText({
+              text: `[ ${door.title} ]`,
+              pos: k.vec2(door.x, door.y - activeH - 25),
+              anchor: "center",
+              size: 16,
+              color: door.color,
+            });
+
+            const bounce = Math.sin(k.time() * 8) * 5;
+            k.drawText({
+              text: "▼",
+              pos: k.vec2(door.x, door.y - activeH - 45 + bounce),
+              anchor: "center",
+              size: 14,
+              color: door.color,
+            });
+          } else {
+            k.drawText({
+              text: door.title,
+              pos: k.vec2(door.x, door.y - activeH - 15),
+              anchor: "center",
+              size: 11,
+              color: k.rgb(100, 100, 120),
+            });
+          }
+        });
+      }
+
+      // -------------------------------------------------------------
+      // Input: navigation
+      // -------------------------------------------------------------
+      function selectPrev() {
+        if (modalActive || !canInput) return;
+        selectedIndex = (selectedIndex - 1 + DOORS.length) % DOORS.length;
+        playBeep();
+      }
+
+      function selectNext() {
+        if (modalActive || !canInput) return;
+        selectedIndex = (selectedIndex + 1) % DOORS.length;
+        playBeep();
+      }
+
+      k.onKeyPress("left", selectPrev);
+      k.onKeyPress("a", selectPrev);
+      k.onKeyPress("right", selectNext);
+      k.onKeyPress("d", selectNext);
+
+      // -------------------------------------------------------------
+      // Input: open door / modal
+      // -------------------------------------------------------------
+      function openDoor() {
+        if (!canInput) return;
+        const currentDoor = DOORS[selectedIndex];
+        modalActive = true;
+        playBeep(600);
+
+        const modal = document.getElementById("modal");
+        const titleNode = document.getElementById("modal-title");
+
+        titleNode.innerText = currentDoor.title;
+        titleNode.style.color = currentDoor.classColor;
+        titleNode.style.textShadow = `0 0 15px ${currentDoor.classColor}`;
+
+        document.getElementById("modal-text").innerText = currentDoor.desc;
+
+        const btn = modal.querySelector("button");
+        btn.style.borderColor = currentDoor.classColor;
+        btn.style.color = currentDoor.classColor;
+
+        btn.onmouseenter = () => {
+          btn.style.backgroundColor = currentDoor.classColor;
+          btn.style.color = "#050508";
+        };
+        btn.onmouseleave = () => {
+          btn.style.backgroundColor = "transparent";
+          btn.style.color = currentDoor.classColor;
+        };
+
+        modal.style.display = "block";
+      }
+
+      k.onKeyPress("space", () => {
+        if (!modalActive && canInput) openDoor();
+      });
+
+      // globally accessible so the modal's close button can reach it
+      window.closeModal = function () {
+        document.getElementById("modal").style.display = "none";
+        modalActive = false;
+        canInput = false;
+
+        // brief lockout to prevent the same spacebar press re-opening a door
+        setTimeout(() => {
+          canInput = true;
+        }, 150);
+      };
+
+      window.addEventListener("keydown", (e) => {
+        if (!modalActive) return;
+        if (e.key === " " || e.code === "Space" || e.key === "Escape") {
+          e.preventDefault();
+          closeModal();
+        }
+      });
+    });
+
+    k.go("main");
+  </script>
 </body>
 </html>
