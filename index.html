@@ -555,8 +555,8 @@
             const y1 = k.lerp(HORIZON_Y, screenH, e1);
             const cx0 = k.lerp(apexX, bottomCenterX, e0);
             const cx1 = k.lerp(apexX, bottomCenterX, e1);
-            const hw0 = k.lerp(3, LANE_HALF_WIDTH, e0);
-            const hw1 = k.lerp(3, LANE_HALF_WIDTH, e1);
+            const hw0 = k.lerp(door.w / 2, LANE_HALF_WIDTH, e0);
+            const hw1 = k.lerp(door.w / 2, LANE_HALF_WIDTH, e1);
 
             const opacity = isSelected ? k.lerp(0.02, 0.16, e1) : k.lerp(0.01, 0.06, e1);
 
@@ -573,15 +573,16 @@
           // ---- Curb edges, brighter/thicker for the selected lane ----
           const leftBottomX = bottomCenterX - LANE_HALF_WIDTH;
           const rightBottomX = bottomCenterX + LANE_HALF_WIDTH;
-          const apex = k.vec2(apexX, HORIZON_Y);
+          const leftTop = k.vec2(apexX - door.w / 2, HORIZON_Y);
+          const rightTop = k.vec2(apexX + door.w / 2, HORIZON_Y);
 
-          k.drawLine({ p1: apex, p2: k.vec2(leftBottomX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
-          k.drawLine({ p1: apex, p2: k.vec2(rightBottomX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+          k.drawLine({ p1: leftTop, p2: k.vec2(leftBottomX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+          k.drawLine({ p1: rightTop, p2: k.vec2(rightBottomX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
 
           // soft outer glow on the selected lane's edges
           if (isSelected) {
-            k.drawLine({ p1: apex, p2: k.vec2(leftBottomX, screenH), color: edgeColor, width: edgeWidth + 5, opacity: 0.15 });
-            k.drawLine({ p1: apex, p2: k.vec2(rightBottomX, screenH), color: edgeColor, width: edgeWidth + 5, opacity: 0.15 });
+            k.drawLine({ p1: leftTop, p2: k.vec2(leftBottomX, screenH), color: edgeColor, width: edgeWidth + 5, opacity: 0.15 });
+            k.drawLine({ p1: rightTop, p2: k.vec2(rightBottomX, screenH), color: edgeColor, width: edgeWidth + 5, opacity: 0.15 });
           }
 
           // ---- Dashed centerline, only on the selected lane ----
