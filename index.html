@@ -3,68 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated Tab Name -->
     <title>Nick Haskaris</title>
+    
+    <!-- Import Google Font for a clean, high-tech retro feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:,">
+
     <style>
+        :root {
+            --neon-green: #00ff66;
+            --neon-blue: #00e5ff;
+            --dark-bg: #0a0a0c;
+            --card-bg: rgba(20, 20, 25, 0.85);
+            --border-color: #1f1f2e;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #121214;
+            background-color: var(--dark-bg);
+            /* Radial glow in the background */
+            background-image: radial-gradient(circle at center, #161622 0%, #0a0a0c 100%);
             overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
-        /* Custom styled game canvas centering */
+
+        /* Modern, centered canvas with a neon glass glow */
         canvas {
             display: block;
-            margin: 0 auto;
-            border: 4px solid #323238;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 
+                        0 0 30px rgba(0, 229, 255, 0.05);
         }
-        /* Style for the overlay HTML Modals */
+
+        /* Glassmorphic Cyberpunk Modals */
         .modal {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #1a1a1e;
-            color: #e1e1e6;
-            border: 3px solid #00ff66;
-            padding: 30px;
+            background-color: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #f1f1f4;
+            border: 2px solid var(--neon-green);
+            padding: 40px;
             z-index: 100;
-            box-shadow: 0px 0px 30px rgba(0, 255, 102, 0.4);
+            box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.9),
+                        0px 0px 30px rgba(0, 255, 102, 0.15);
             text-align: center;
-            border-radius: 8px;
-            min-width: 320px;
+            border-radius: 16px;
+            min-width: 360px;
+            max-width: 500px;
+            animation: modalFadeIn 0.25s ease-out;
         }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translate(-50%, -45%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
         .modal h2 {
             margin-top: 0;
-            color: #00ff66;
-            text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+            text-transform: uppercase;
         }
+
+        .modal p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        /* Retro Neon Button */
         .modal button {
-            background-color: #00ff66;
-            color: #121214;
-            border: none;
-            padding: 10px 20px;
+            background-color: transparent;
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            padding: 12px 24px;
+            font-size: 1rem;
             font-weight: bold;
             font-family: inherit;
             cursor: pointer;
-            margin-top: 20px;
-            border-radius: 4px;
-            transition: 0.2s;
+            margin-top: 25px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease-in-out;
         }
+
         .modal button:hover {
-            background-color: #fff;
-            box-shadow: 0 0 10px #fff;
+            background-color: var(--neon-green);
+            color: #0a0a0c;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
         }
+
         .construction-tag {
+            display: inline-block;
+            background-color: rgba(241, 196, 15, 0.1);
+            border: 1px dashed #f1c40f;
             color: #f1c40f;
-            font-weight: bold;
-            animation: blink 1.2s infinite;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite ease-in-out;
         }
-        @keyframes blink {
+
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Footer hints outside the game frame */
+        .footer-hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #4a4a6a;
+            letter-spacing: 1px;
         }
     </style>
     <!-- Import KAPLAY.js library via CDN -->
@@ -75,74 +142,87 @@
     <!-- HTML Modals for when the player enters portals -->
     <div id="modal" class="modal">
         <h2 id="modal-title">Portal</h2>
-        <p class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</p>
+        <div class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</div>
         <p id="modal-text">Content is being assembled...</p>
-        <button onclick="closeModal()">Return to World (ESC)</button>
+        <button onclick="closeModal()">Return to World [SPACE]</button>
     </div>
+
+    <div class="footer-hint">NICK HASKARIS // PORTFOLIO ALPHA</div>
 
     <script>
         // Initialize KAPLAY
         const k = kaplay({
             width: 800,
             height: 600,
-            background: "#121214", // FIXED: CSS Hex Code string works perfectly here!
+            background: "#0c0c0f", // Sleek dark slate
             letterbox: true,        
         });
 
-        // 1. Generate retro procedural sprites (No external files required!)
-        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); // Built-in friendly KAPLAY asset
+        // Load built-in friendly KAPLAY asset
+        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); 
         
-        // Let's create visual scenes
         k.scene("main", () => {
-            // Set simple physics
-            const SPEED = 250;
+            const SPEED = 280;
 
             // Simple UI Instruction text inside the game canvas
             k.add([
-                k.text("Use WASD/Arrows to Move around! Walk into a zone.", { size: 16 }),
-                k.pos(20, 20),
-                k.color(150, 150, 150),
+                k.text("USE WASD OR ARROWS TO MOVE // WALK INTO A PORTAL TO EXPAND", { 
+                    size: 14,
+                    font: "sans-serif" // Keeps canvas typography clean
+                } ),
+                k.pos(25, 25),
+                k.color(100, 100, 130),
             ]);
 
             // Add the Player Entity
             const player = k.add([
                 k.sprite("player"),
                 k.pos(k.center()),
-                k.area(), // Collision box
-                k.body(), // Physical behavior
-                "player"  // Tag
+                k.area(), 
+                k.body(), 
+                "player"  
             ]);
 
-            // Setup Portals as physical areas with custom metadata tags
+            // Setup Portals with highly polished neon color definitions
             const zones = [
-                { title: "Work History", x: 150, y: 150, color: k.rgb(52, 152, 219), tag: "work" },
-                { title: "Projects", x: 650, y: 150, color: k.rgb(155, 89, 182), tag: "projects" },
-                { title: "Contact Info", x: 400, y: 450, color: k.rgb(46, 204, 113), tag: "contact" }
+                { title: "WORK HISTORY", x: 180, y: 180, color: k.rgb(0, 229, 255), tag: "work" }, // Neon Blue
+                { title: "PROJECTS", x: 620, y: 180, color: k.rgb(180, 0, 255), tag: "projects" },  // Neon Purple
+                { title: "CONTACT INFO", x: 400, y: 440, color: k.rgb(0, 255, 102), tag: "contact" }  // Neon Green
             ];
 
             zones.forEach(zone => {
-                // Portal pad
+                // Outer glowing/border ring (gives depth)
+                k.add([
+                    k.rect(132, 92, { radius: 12 }),
+                    k.pos(zone.x, zone.y),
+                    k.anchor("center"),
+                    k.color(24, 24, 37),
+                    k.outline(2, zone.color)
+                ]);
+
+                // Inner Portal pad
                 k.add([
                     k.rect(120, 80, { radius: 10 }),
                     k.pos(zone.x, zone.y),
                     k.anchor("center"),
-                    k.color(zone.color),
+                    k.color(20, 20, 28),
                     k.area(),
                     zone.tag
                 ]);
 
                 // Zone text label
                 k.add([
-                    k.text(zone.title, { size: 14 }),
-                    k.pos(zone.x, zone.y - 60),
+                    k.text(zone.title, { size: 13 }),
+                    k.pos(zone.x, zone.y - 68),
                     k.anchor("center"),
                     k.color(255, 255, 255)
                 ]);
             });
 
-            // 2. Control logic (WASD and Arrows)
+            // Control state
             let controlsActive = true;
 
+            // Player movement logic (Keyboard inputs)
             k.onKeyDown("left", () => { if(controlsActive) player.move(-SPEED, 0) });
             k.onKeyDown("a", () => { if(controlsActive) player.move(-SPEED, 0) });
             
@@ -155,11 +235,11 @@
             k.onKeyDown("down", () => { if(controlsActive) player.move(0, SPEED) });
             k.onKeyDown("s", () => { if(controlsActive) player.move(0, SPEED) });
 
-            // 3. Collision Logic: When the player steps on a portal pad
+            // Portal Trigger Event
             function triggerPortal(title, description, bounceDirection) {
                 controlsActive = false;
                 
-                // Show standard HTML modal overlay
+                // Set modal content and show it
                 const modal = document.getElementById("modal");
                 document.getElementById("modal-title").innerText = title;
                 document.getElementById("modal-text").innerText = description;
@@ -170,28 +250,23 @@
             }
 
             player.onCollide("work", () => {
-                triggerPortal("Work History", "Here is where I'll host my work questline. Expect career leveling, previous employment achievements, and dynamic role stats!", k.vec2(0, 100));
+                triggerPortal("Work History", "Welcome to the career log! This portal will soon compile a list of jobs held, leadership XP earned, and dynamic developer stats.", k.vec2(0, 100));
             });
 
             player.onCollide("projects", () => {
-                triggerPortal("Projects Showcase", "A display of legendary creations. Git repositories, visual showcases, and real-time live demonstrations will live here.", k.vec2(0, 100));
+                triggerPortal("Projects Showcase", "Inside this hub live standard-shattering builds, active GitHub repos, and direct live links to live web designs.", k.vec2(0, 100));
             });
 
             player.onCollide("contact", () => {
-                triggerPortal("Contact & Connect", "Send an encrypted signal or dispatch a carrier pigeon! My email, LinkedIn, and social portals will be linked here.", k.vec2(0, -100));
+                triggerPortal("Contact & Connect", "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.", k.vec2(0, -100));
             });
 
-            // Make sure the player doesn't fly off the screen
+            // Prevent player from walking off the screen bounds
             player.onUpdate(() => {
-                if (player.pos.x < 0) player.pos.x = 0;
-                if (player.pos.x > k.width() - 40) player.pos.x = k.width() - 40;
-                if (player.pos.y < 0) player.pos.y = 0;
-                if (player.pos.y > k.height() - 40) player.pos.y = k.height() - 40;
-            });
-
-            // Escape key closes modal
-            k.onKeyPress("escape", () => {
-                closeModal();
+                if (player.pos.x < 15) player.pos.x = 15;
+                if (player.pos.x > k.width() - 55) player.pos.x = k.width() - 55;
+                if (player.pos.y < 15) player.pos.y = 15;
+                if (player.pos.y > k.height() - 55) player.pos.y = k.height() - 55;
             });
 
             // Globally accessible function to restore game controls
@@ -199,9 +274,21 @@
                 document.getElementById("modal").style.display = "none";
                 controlsActive = true;
             }
+
+            // Keyboard Exit Listeners (For both Space and Escape keys)
+            window.addEventListener("keydown", (e) => {
+                const modal = document.getElementById("modal");
+                // Check if modal is visible
+                if (modal.style.display === "block") {
+                    if (e.key === " " || e.code === "Space" || e.key === "Escape") {
+                        e.preventDefault(); // Prevents default browser scroll on Space
+                        closeModal();
+                    }
+                }
+            });
         });
 
-        // Start game
+        // Launch Game
         k.go("main");
     </script>
 </body>
