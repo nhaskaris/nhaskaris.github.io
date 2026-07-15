@@ -6,7 +6,7 @@
   <title>Nick Haskaris</title>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght=500;700;900&display=swap"
     rel="stylesheet"
   />
   <link rel="icon" href="data:," />
@@ -114,7 +114,7 @@
       transition: opacity 0.16s ease;
     }
 
-    /* ---------- Room panel (replaces the old small modal) ---------- */
+    /* ---------- Room panel ---------- */
     .room-panel {
       display: none;
       position: fixed;
@@ -317,11 +317,11 @@
 
     const CAM_DEFAULT_POS = k.vec2(400, 300);
     const CAM_DEFAULT_SCALE = 1;
-    const CAM_ZOOM_SCALE = 5;
+    const CAM_ZOOM_SCALE = 7.5; // Zoom depth slightly deeper for screen coverage clearance
     
     // Split transition timings
-    const DOOR_OPEN_DURATION = 0.45;  // seconds to slide open/shut
-    const CAM_ZOOM_DURATION = 0.55;   // seconds to zoom in/out
+    const DOOR_OPEN_DURATION = 0.40;  // Slightly snappier door slide
+    const CAM_ZOOM_DURATION = 0.60;   // Silky smooth dive duration
 
     function easeInOutCubic(x) {
       return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
@@ -334,7 +334,7 @@
       let doorState = "idle";
       let canInput = true; 
 
-      // Interactive sliding doors progress (0 = fully closed, 1 = fully open)
+      // Sliding doors progress (0 = fully closed, 1 = fully open)
       let doorOpenProgress = 0;
 
       // Camera state variables
@@ -436,7 +436,12 @@
         doorState = "zooming-in";
         transitionT = 0;
         camFrom = CAM_DEFAULT_POS;
-        camTo = k.vec2(door.x, HORIZON_Y + 10);
+        
+        // CLEANER TARGETING: Track exactly to the horizontal & vertical center of the door
+        const activeH = door.h * doorScale[door.id];
+        const centerY = door.y - (activeH / 2);
+        
+        camTo = k.vec2(door.x, centerY);
         scaleFrom = CAM_DEFAULT_SCALE;
         scaleTo = CAM_ZOOM_SCALE;
         playBeep(600);
@@ -447,7 +452,11 @@
         hideRoomPanel();
         doorState = "zooming-out";
         transitionT = 0;
-        camFrom = k.vec2(door.x, HORIZON_Y + 10);
+        
+        const activeH = door.h * doorScale[door.id];
+        const centerY = door.y - (activeH / 2);
+        
+        camFrom = k.vec2(door.x, centerY);
         camTo = CAM_DEFAULT_POS;
         scaleFrom = CAM_ZOOM_SCALE;
         scaleTo = CAM_DEFAULT_SCALE;
@@ -479,8 +488,11 @@
         else if (doorState === "zooming-in") {
           transitionT = Math.min(1, transitionT + dt / CAM_ZOOM_DURATION);
           const eased = easeInOutCubic(transitionT);
+          
+          // Cleaner translation & Exponential zooming for correct 3D perspective
           const pos = k.lerp(camFrom, camTo, eased);
-          const scale = k.lerp(scaleFrom, scaleTo, eased);
+          const scale = Math.exp(k.lerp(Math.log(scaleFrom), Math.log(scaleTo), eased));
+          
           k.camPos(pos);
           k.camScale(scale, scale);
 
@@ -495,8 +507,10 @@
         else if (doorState === "zooming-out") {
           transitionT = Math.min(1, transitionT + dt / CAM_ZOOM_DURATION);
           const eased = easeInOutCubic(transitionT);
+          
           const pos = k.lerp(camFrom, camTo, eased);
-          const scale = k.lerp(scaleFrom, scaleTo, eased);
+          const scale = Math.exp(k.lerp(Math.log(scaleFrom), Math.log(scaleTo), eased));
+          
           k.camPos(pos);
           k.camScale(scale, scale);
 
@@ -671,7 +685,7 @@
             pos: k.vec2(door.x, door.y),
             anchor: "bot",
             color: door.color,
-            opacity: isSelected ? (0.05 + doorOpenProgress * 0.4) : 0.02,
+            opacity: isSelected ? (0.05 + doorOpenProgress * 0.45) : 0.02,
           });
 
           // Draw split-sliding elevator doors if selected, else static panels
@@ -683,7 +697,7 @@
             width: panelW,
             height: activeH,
             pos: k.vec2(door.x - (panelW * curOpen), door.y),
-            anchor: "botright", // Snaps flush to the center of the door frame
+            anchor: "botright", 
             color: k.rgb(10, 10, 15),
             outline: {
               color: isSelected ? door.color : k.rgb(40, 40, 55),
@@ -696,7 +710,7 @@
             width: panelW,
             height: activeH,
             pos: k.vec2(door.x + (panelW * curOpen), door.y),
-            anchor: "botleft",  // Snaps flush to the center of the door frame
+            anchor: "botleft",  
             color: k.rgb(10, 10, 15),
             outline: {
               color: isSelected ? door.color : k.rgb(40, 40, 55),
@@ -717,7 +731,7 @@
             },
           });
 
-          // Door handles (only visible when door is mostly closed)
+          // Door handles
           if (curOpen < 0.8) {
             const handleOpacity = 1 - curOpen;
             k.drawCircle({
@@ -744,7 +758,6 @@
               color: door.color,
             });
 
-            // Display "OPEN" command icon if ready
             if (doorState === "idle") {
               const bounce = Math.sin(k.time() * 8) * 5;
               k.drawText({
