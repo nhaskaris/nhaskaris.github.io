@@ -289,24 +289,50 @@
                 });
             });
 
+            // Simple helper to synthesize a retro synth beep on navigation
+            function playBeep() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(400, ctx.currentTime); // Quick retro pitch
+                    
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime); // Low volume so it's not loud
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // Quick fade out
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch (e) {
+                    // Fail silently if browser blocks early audio context
+                }
+            }
+
             // Input Selection Controllers
             k.onKeyPress("left", () => {
                 if (modalActive) return;
                 selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
-                k.play("bounce", { volume: 0.1 }); // Playful built-in system sound
+                playBeep(); // FIXED: Uses our native synthesized sound!
             });
             k.onKeyPress("a", () => {
                 if (modalActive) return;
                 selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
+                playBeep();
             });
 
             k.onKeyPress("right", () => {
                 if (modalActive) return;
                 selectedIndex = (selectedIndex + 1) % doors.length;
+                playBeep();
             });
             k.onKeyPress("d", () => {
                 if (modalActive) return;
                 selectedIndex = (selectedIndex + 1) % doors.length;
+                playBeep();
             });
 
             // Action Trigger logic (Open selected door)
