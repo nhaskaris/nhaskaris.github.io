@@ -342,7 +342,8 @@
         const dt = k.dt();
 
         drawHorizon(screenW);
-        drawFloorPerspectiveLines(screenW, screenH);
+        drawAmbientFan(screenW, screenH);
+        drawRoadLanes(screenW, screenH);
         drawFloorScanlines(screenW, screenH, dt);
         drawHallwayFraming(screenW);
         drawDoors(dt);
@@ -357,18 +358,61 @@
         });
       }
 
-      function drawFloorPerspectiveLines(screenW, screenH) {
-        const numFloorLines = 16;
+      // Faint background texture radiating from the vanishing point — kept
+      // subtle so the three road lanes read as the main structure.
+      function drawAmbientFan(screenW, screenH) {
+        const numFloorLines = 10;
         for (let i = 0; i <= numFloorLines; i++) {
           const progress = i / numFloorLines;
           const startX = k.lerp(-400, screenW + 400, progress);
           k.drawLine({
-            p1: k.vec2(400, HORIZON_Y), // vanishing point at horizon center
+            p1: k.vec2(400, HORIZON_Y),
             p2: k.vec2(startX, screenH),
-            color: k.rgb(15, 15, 30),
-            width: 1.5,
+            color: k.rgb(12, 12, 22),
+            width: 1,
           });
         }
+      }
+
+      // The road forks into three lanes right at the vanishing point, one
+      // leading to each door. Each lane is built from several fanned lines
+      // (for a soft "filled path" look) plus two brighter edge lines.
+      const VANISH = k.vec2(400, HORIZON_Y);
+      const LANE_HALF_WIDTH = 55;
+      const LANE_DIVERGE = 2.35; // how far the lanes spread apart by the bottom of the screen
+
+      function drawRoadLanes(screenW, screenH) {
+        DOORS.forEach((door) => {
+          const isSelected = door.id === selectedIndex;
+          const offset = door.x - VANISH.x;
+          const bottomCenterX = VANISH.x + offset * LANE_DIVERGE;
+          const leftX = bottomCenterX - LANE_HALF_WIDTH;
+          const rightX = bottomCenterX + LANE_HALF_WIDTH;
+
+          const fillColor = isSelected ? door.color : k.rgb(30, 30, 42);
+          const fillOpacity = isSelected ? 0.1 : 0.05;
+          const edgeColor = isSelected ? door.color : k.rgb(45, 45, 62);
+          const edgeWidth = isSelected ? 2.5 : 1.5;
+          const edgeOpacity = isSelected ? 0.85 : 0.4;
+
+          // soft fill: several thin lines fanned across the lane width
+          const fillLines = 7;
+          for (let i = 0; i <= fillLines; i++) {
+            const t = i / fillLines;
+            const bottomX = k.lerp(leftX, rightX, t);
+            k.drawLine({
+              p1: VANISH,
+              p2: k.vec2(bottomX, screenH),
+              color: fillColor,
+              width: 1,
+              opacity: fillOpacity,
+            });
+          }
+
+          // crisp edges so each lane clearly reads as its own path
+          k.drawLine({ p1: VANISH, p2: k.vec2(leftX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+          k.drawLine({ p1: VANISH, p2: k.vec2(rightX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+        });
       }
 
       function drawFloorScanlines(screenW, screenH, dt) {
