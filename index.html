@@ -374,18 +374,18 @@
         }
       }
 
-      // The road forks into three lanes right at the vanishing point, one
-      // leading to each door. Each lane is built from several fanned lines
-      // (for a soft "filled path" look) plus two brighter edge lines.
-      const VANISH = k.vec2(400, HORIZON_Y);
+      // The road forks into three lanes, one leading to each door. Each
+      // lane's apex sits directly under its own door (not a single shared
+      // point) so it's visually unambiguous which path leads where.
       const LANE_HALF_WIDTH = 55;
       const LANE_DIVERGE = 2.35; // how far the lanes spread apart by the bottom of the screen
 
       function drawRoadLanes(screenW, screenH) {
         DOORS.forEach((door) => {
           const isSelected = door.id === selectedIndex;
-          const offset = door.x - VANISH.x;
-          const bottomCenterX = VANISH.x + offset * LANE_DIVERGE;
+          const apex = k.vec2(door.x, HORIZON_Y); // lane starts right under its own door
+          const offset = door.x - 400; // spread relative to screen center
+          const bottomCenterX = 400 + offset * LANE_DIVERGE;
           const leftX = bottomCenterX - LANE_HALF_WIDTH;
           const rightX = bottomCenterX + LANE_HALF_WIDTH;
 
@@ -401,7 +401,7 @@
             const t = i / fillLines;
             const bottomX = k.lerp(leftX, rightX, t);
             k.drawLine({
-              p1: VANISH,
+              p1: apex,
               p2: k.vec2(bottomX, screenH),
               color: fillColor,
               width: 1,
@@ -410,8 +410,8 @@
           }
 
           // crisp edges so each lane clearly reads as its own path
-          k.drawLine({ p1: VANISH, p2: k.vec2(leftX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
-          k.drawLine({ p1: VANISH, p2: k.vec2(rightX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+          k.drawLine({ p1: apex, p2: k.vec2(leftX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
+          k.drawLine({ p1: apex, p2: k.vec2(rightX, screenH), color: edgeColor, width: edgeWidth, opacity: edgeOpacity });
         });
       }
 
