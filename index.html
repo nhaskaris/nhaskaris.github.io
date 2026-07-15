@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gamified CV | KAPLAY.js</title>
+    <title>Nick Haskaris</title>
     <style>
         body {
             margin: 0;
@@ -85,16 +85,16 @@
         const k = kaplay({
             width: 800,
             height: 600,
-            background: [18, 18, 20], // Dark charcoal aesthetic [1.2.5]
-            letterbox: true,          // Automatically scales cleanly
+            background: "#121214", // FIXED: CSS Hex Code string works perfectly here!
+            letterbox: true,        
         });
 
         // 1. Generate retro procedural sprites (No external files required!)
-        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); // Built-in friendly KAPLAY asset [1.1.2]
+        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); // Built-in friendly KAPLAY asset
         
         // Let's create visual scenes
         k.scene("main", () => {
-            // Set simple physics [1.2.5]
+            // Set simple physics
             const SPEED = 250;
 
             // Simple UI Instruction text inside the game canvas
@@ -104,13 +104,13 @@
                 k.color(150, 150, 150),
             ]);
 
-            // Add the Player Entity [1.1.2, 1.2.5]
+            // Add the Player Entity
             const player = k.add([
                 k.sprite("player"),
                 k.pos(k.center()),
-                k.area(), // Collision box [1.1.2, 1.2.5]
-                k.body(), // Physical behavior [1.1.2, 1.2.5]
-                "player"  // Tag [1.1.2]
+                k.area(), // Collision box
+                k.body(), // Physical behavior
+                "player"  // Tag
             ]);
 
             // Setup Portals as physical areas with custom metadata tags
@@ -138,9 +138,9 @@
                     k.anchor("center"),
                     k.color(255, 255, 255)
                 ]);
-            ]);
+            });
 
-            // 2. Control logic (WASD and Arrows) [1.1.2, 1.2.5]
+            // 2. Control logic (WASD and Arrows)
             let controlsActive = true;
 
             k.onKeyDown("left", () => { if(controlsActive) player.move(-SPEED, 0) });
@@ -155,7 +155,7 @@
             k.onKeyDown("down", () => { if(controlsActive) player.move(0, SPEED) });
             k.onKeyDown("s", () => { if(controlsActive) player.move(0, SPEED) });
 
-            // 3. Collision Logic: When the player steps on a portal pad [1.2.5]
+            // 3. Collision Logic: When the player steps on a portal pad
             function triggerPortal(title, description, bounceDirection) {
                 controlsActive = false;
                 
@@ -189,7 +189,7 @@
                 if (player.pos.y > k.height() - 40) player.pos.y = k.height() - 40;
             });
 
-            // Escape key closes modal [1.2.5]
+            // Escape key closes modal
             k.onKeyPress("escape", () => {
                 closeModal();
             });
