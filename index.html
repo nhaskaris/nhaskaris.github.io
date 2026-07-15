@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Updated Tab Name -->
     <title>Nick Haskaris</title>
     
-    <!-- Import Google Font for a clean, high-tech retro feel -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="icon" href="data:,">
 
@@ -14,17 +12,17 @@
         :root {
             --neon-green: #00ff66;
             --neon-blue: #00e5ff;
-            --dark-bg: #0a0a0c;
-            --card-bg: rgba(20, 20, 25, 0.85);
-            --border-color: #1f1f2e;
+            --neon-purple: #b400ff;
+            --dark-bg: #050508;
+            --card-bg: rgba(15, 15, 20, 0.9);
+            --border-color: #1a1a26;
         }
 
         body {
             margin: 0;
             padding: 0;
             background-color: var(--dark-bg);
-            /* Radial glow in the background */
-            background-image: radial-gradient(circle at center, #161622 0%, #0a0a0c 100%);
+            background-image: radial-gradient(circle at center, #0f0f1b 0%, #050508 100%);
             overflow: hidden;
             font-family: 'Share Tech Mono', monospace;
             display: flex;
@@ -34,13 +32,12 @@
             height: 100vh;
         }
 
-        /* Modern, centered canvas with a neon glass glow */
         canvas {
             display: block;
             border: 2px solid var(--border-color);
             border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 
-                        0 0 30px rgba(0, 229, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 
+                        0 0 30px rgba(0, 229, 255, 0.03);
         }
 
         /* Glassmorphic Cyberpunk Modals */
@@ -51,32 +48,29 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             color: #f1f1f4;
-            border: 2px solid var(--neon-green);
+            border: 2px solid var(--border-color);
             padding: 40px;
             z-index: 100;
-            box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.9),
-                        0px 0px 30px rgba(0, 255, 102, 0.15);
+            box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.95);
             text-align: center;
             border-radius: 16px;
             min-width: 360px;
             max-width: 500px;
-            animation: modalFadeIn 0.25s ease-out;
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translate(-50%, -45%); }
+            from { opacity: 0; transform: translate(-50%, -40%); }
             to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
         .modal h2 {
             margin-top: 0;
-            font-size: 1.8rem;
+            font-size: 2rem;
             letter-spacing: 2px;
-            color: var(--neon-green);
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
             text-transform: uppercase;
         }
 
@@ -86,11 +80,10 @@
             color: #cbd5e1;
         }
 
-        /* Retro Neon Button */
         .modal button {
             background-color: transparent;
-            color: var(--neon-green);
-            border: 2px solid var(--neon-green);
+            border: 2px solid white;
+            color: white;
             padding: 12px 24px;
             font-size: 1rem;
             font-weight: bold;
@@ -100,13 +93,13 @@
             border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.25s ease;
         }
 
         .modal button:hover {
-            background-color: var(--neon-green);
+            background-color: white;
             color: #0a0a0c;
-            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
         .construction-tag {
@@ -126,11 +119,10 @@
             50% { opacity: 0.6; }
         }
 
-        /* Footer hints outside the game frame */
         .footer-hint {
             margin-top: 15px;
             font-size: 0.9rem;
-            color: #4a4a6a;
+            color: #3a3a50;
             letter-spacing: 1px;
         }
     </style>
@@ -144,151 +136,234 @@
         <h2 id="modal-title">Portal</h2>
         <div class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</div>
         <p id="modal-text">Content is being assembled...</p>
-        <button onclick="closeModal()">Return to World [SPACE]</button>
+        <button onclick="closeModal()">Close Door [SPACE]</button>
     </div>
 
-    <div class="footer-hint">NICK HASKARIS // PORTFOLIO ALPHA</div>
+    <div class="footer-hint">NICK HASKARIS // PORTFOLIO 3D ALPHA</div>
 
     <script>
         // Initialize KAPLAY
         const k = kaplay({
             width: 800,
             height: 600,
-            background: "#0c0c0f", // Sleek dark slate
+            background: "#050508", 
             letterbox: true,        
         });
 
-        // Load built-in friendly KAPLAY asset
-        k.loadSprite("player", "https://play.kaplayjs.com/bean.png"); 
-        
         k.scene("main", () => {
-            const SPEED = 280;
-
-            // Simple UI Instruction text inside the game canvas
-            k.add([
-                k.text("USE WASD OR ARROWS TO MOVE // WALK INTO A PORTAL TO EXPAND", { 
-                    size: 14,
-                    font: "sans-serif" // Keeps canvas typography clean
-                } ),
-                k.pos(25, 25),
-                k.color(100, 100, 130),
-            ]);
-
-            // Add the Player Entity
-            const player = k.add([
-                k.sprite("player"),
-                k.pos(k.center()),
-                k.area(), 
-                k.body(), 
-                "player"  
-            ]);
-
-            // Setup Portals with highly polished neon color definitions
-            const zones = [
-                { title: "WORK HISTORY", x: 180, y: 180, color: k.rgb(0, 229, 255), tag: "work" }, // Neon Blue
-                { title: "PROJECTS", x: 620, y: 180, color: k.rgb(180, 0, 255), tag: "projects" },  // Neon Purple
-                { title: "CONTACT INFO", x: 400, y: 440, color: k.rgb(0, 255, 102), tag: "contact" }  // Neon Green
+            // Door Data Map (Simulating perspective x-coords and sizing)
+            const doors = [
+                { id: 0, title: "WORK HISTORY", x: 220, y: 260, w: 90, h: 180, color: k.rgb(0, 229, 255), desc: "Welcome to the career log! This portal will soon compile a list of jobs held, leadership XP earned, and dynamic developer stats.", classColor: "#00e5ff" },
+                { id: 1, title: "PROJECTS", x: 400, y: 260, w: 110, h: 200, color: k.rgb(180, 0, 255), desc: "Inside this hub live standard-shattering builds, active GitHub repos, and direct live links to live web designs.", classColor: "#b400ff" },
+                { id: 2, title: "CONTACT INFO", x: 580, y: 260, w: 90, h: 180, color: k.rgb(0, 255, 102), desc: "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.", classColor: "#00ff66" }
             ];
 
-            zones.forEach(zone => {
-                // Outer glowing/border ring (gives depth)
-                k.add([
-                    k.rect(132, 92, { radius: 12 }),
-                    k.pos(zone.x, zone.y),
-                    k.anchor("center"),
-                    k.color(24, 24, 37),
-                    k.outline(2, zone.color)
-                ]);
+            let selectedIndex = 1; // Default to the middle "Projects" door
+            let modalActive = false;
 
-                // Inner Portal pad
-                k.add([
-                    k.rect(120, 80, { radius: 10 }),
-                    k.pos(zone.x, zone.y),
-                    k.anchor("center"),
-                    k.color(20, 20, 28),
-                    k.area(),
-                    zone.tag
-                ]);
+            // Simple instructions drawing
+            k.add([
+                k.text("USE LEFT/RIGHT ARROWS TO AIM  //  PRESS SPACE TO OPEN DOOR", { size: 13 }),
+                k.pos(k.width() / 2, 40),
+                k.anchor("center"),
+                k.color(90, 90, 115)
+            ]);
 
-                // Zone text label
-                k.add([
-                    k.text(zone.title, { size: 13 }),
-                    k.pos(zone.x, zone.y - 68),
-                    k.anchor("center"),
-                    k.color(255, 255, 255)
-                ]);
+            // Draw a beautiful pseudo-3D grid floor dynamically
+            let gridOffset = 0;
+            k.onDraw(() => {
+                const vanishingY = 260; // Horizon vanishing point
+                const screenW = k.width();
+                const screenH = k.height();
+
+                // 1. Draw Horizon Line
+                k.drawLine({
+                    p1: k.vec2(0, vanishingY),
+                    p2: k.vec2(screenW, vanishingY),
+                    color: k.rgb(15, 15, 25),
+                    width: 2
+                });
+
+                // 2. Draw 3D Floor Perspective lines radiating from the vanishing point
+                const numFloorLines = 16;
+                for (let i = 0; i <= numFloorLines; i++) {
+                    const progress = i / numFloorLines;
+                    const startX = k.lerp(-400, screenW + 400, progress); // Fan lines out widely at bottom
+                    k.drawLine({
+                        p1: k.vec2(400, vanishingY), // Vanishing point at exact center of horizon
+                        p2: k.vec2(startX, screenH),
+                        color: k.rgb(15, 15, 30),
+                        width: 1.5
+                    });
+                }
+
+                // 3. Draw Floor Horizontal Lines (moving down to create depth animation)
+                gridOffset += 1;
+                if (gridOffset >= 40) gridOffset = 0;
+
+                for (let j = 0; j < 12; j++) {
+                    // Exponential scaling creates the optical illusion of 3D depth
+                    const ratio = Math.pow((j + (gridOffset / 40)) / 12, 3);
+                    const y = vanishingY + ratio * (screenH - vanishingY);
+                    
+                    // Fade out lines closer to the horizon line
+                    const alpha = Math.floor(ratio * 70);
+                    k.drawLine({
+                        p1: k.vec2(0, y),
+                        p2: k.vec2(screenW, y),
+                        color: k.rgb(alpha, alpha, alpha + 30),
+                        width: 1
+                    });
+                }
+
+                // 4. Draw the Hallway perspective framing lines (Walls and Ceiling structure)
+                k.drawLine({ p1: k.vec2(0, 0), p2: k.vec2(150, vanishingY), color: k.rgb(25, 25, 40), width: 2 });
+                k.drawLine({ p1: k.vec2(screenW, 0), p2: k.vec2(screenW - 150, vanishingY), color: k.rgb(25, 25, 40), width: 2 });
+
+                // 5. Draw the 3D Doors in Real-time based on selection state
+                doors.forEach((door) => {
+                    const isSelected = door.id === selectedIndex;
+                    const scale = isSelected ? 1.15 : 1.0;
+                    const activeW = door.w * scale;
+                    const activeH = door.h * scale;
+
+                    // Glow background panel under doors
+                    k.drawRect({
+                        width: activeW,
+                        height: activeH,
+                        pos: k.vec2(door.x, door.y),
+                        anchor: "bot",
+                        color: isSelected ? door.color : k.rgb(10, 10, 15),
+                        opacity: isSelected ? 0.08 : 0.02,
+                    });
+
+                    // Door Outline
+                    k.drawRect({
+                        width: activeW,
+                        height: activeH,
+                        pos: k.vec2(door.x, door.y),
+                        anchor: "bot",
+                        fill: false,
+                        outline: {
+                            color: isSelected ? door.color : k.rgb(40, 40, 55),
+                            width: isSelected ? 4 : 2
+                        }
+                    });
+
+                    // Door handle detail (adds to the 3D door illusion)
+                    k.drawCircle({
+                        pos: k.vec2(door.x + (activeW/2.8), door.y - (activeH/2)),
+                        radius: isSelected ? 4 : 3,
+                        color: isSelected ? door.color : k.rgb(50, 50, 60),
+                    });
+
+                    // Label above the door
+                    if (isSelected) {
+                        k.drawText({
+                            text: `[ ${door.title} ]`,
+                            pos: k.vec2(door.x, door.y - activeH - 25),
+                            anchor: "center",
+                            size: 16,
+                            color: door.color
+                        });
+
+                        // Pulsing entry arrow pointing down at selected door
+                        const bounce = Math.sin(k.time() * 8) * 5;
+                        k.drawText({
+                            text: "▼",
+                            pos: k.vec2(door.x, door.y - activeH - 45 + bounce),
+                            anchor: "center",
+                            size: 14,
+                            color: door.color
+                        });
+                    } else {
+                        // Dim labels for inactive doors
+                        k.drawText({
+                            text: door.title,
+                            pos: k.vec2(door.x, door.y - activeH - 15),
+                            anchor: "center",
+                            size: 11,
+                            color: k.rgb(100, 100, 120)
+                        });
+                    }
+                });
             });
 
-            // Control state
-            let controlsActive = true;
+            // Input Selection Controllers
+            k.onKeyPress("left", () => {
+                if (modalActive) return;
+                selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
+                k.play("bounce", { volume: 0.1 }); // Playful built-in system sound
+            });
+            k.onKeyPress("a", () => {
+                if (modalActive) return;
+                selectedIndex = (selectedIndex - 1 + doors.length) % doors.length;
+            });
 
-            // Player movement logic (Keyboard inputs)
-            k.onKeyDown("left", () => { if(controlsActive) player.move(-SPEED, 0) });
-            k.onKeyDown("a", () => { if(controlsActive) player.move(-SPEED, 0) });
-            
-            k.onKeyDown("right", () => { if(controlsActive) player.move(SPEED, 0) });
-            k.onKeyDown("d", () => { if(controlsActive) player.move(SPEED, 0) });
-            
-            k.onKeyDown("up", () => { if(controlsActive) player.move(0, -SPEED) });
-            k.onKeyDown("w", () => { if(controlsActive) player.move(0, -SPEED) });
-            
-            k.onKeyDown("down", () => { if(controlsActive) player.move(0, SPEED) });
-            k.onKeyDown("s", () => { if(controlsActive) player.move(0, SPEED) });
+            k.onKeyPress("right", () => {
+                if (modalActive) return;
+                selectedIndex = (selectedIndex + 1) % doors.length;
+            });
+            k.onKeyPress("d", () => {
+                if (modalActive) return;
+                selectedIndex = (selectedIndex + 1) % doors.length;
+            });
 
-            // Portal Trigger Event
-            function triggerPortal(title, description, bounceDirection) {
-                controlsActive = false;
-                
-                // Set modal content and show it
+            // Action Trigger logic (Open selected door)
+            function openDoor() {
+                const currentDoor = doors[selectedIndex];
+                modalActive = true;
+
+                // Configure modern themed Modal
                 const modal = document.getElementById("modal");
-                document.getElementById("modal-title").innerText = title;
-                document.getElementById("modal-text").innerText = description;
-                modal.style.display = "block";
+                const titleNode = document.getElementById("modal-title");
+                
+                titleNode.innerText = currentDoor.title;
+                titleNode.style.color = currentDoor.classColor;
+                titleNode.style.textShadow = `0 0 15px ${currentDoor.classColor}`;
+                
+                document.getElementById("modal-text").innerText = currentDoor.desc;
+                
+                const btn = modal.querySelector("button");
+                btn.style.borderColor = currentDoor.classColor;
+                btn.style.color = currentDoor.classColor;
+                
+                // Add hover style effect override dynamically
+                btn.onmouseenter = () => {
+                    btn.style.backgroundColor = currentDoor.classColor;
+                    btn.style.color = "#050508";
+                };
+                btn.onmouseleave = () => {
+                    btn.style.backgroundColor = "transparent";
+                    btn.style.color = currentDoor.classColor;
+                };
 
-                // Bounce player slightly backward off the portal
-                player.move(bounceDirection.x, bounceDirection.y);
+                modal.style.display = "block";
             }
 
-            player.onCollide("work", () => {
-                triggerPortal("Work History", "Welcome to the career log! This portal will soon compile a list of jobs held, leadership XP earned, and dynamic developer stats.", k.vec2(0, 100));
+            // Bind Spacebar key inside game frame
+            k.onKeyPress("space", () => {
+                if (!modalActive) {
+                    openDoor();
+                } else {
+                    closeModal();
+                }
             });
 
-            player.onCollide("projects", () => {
-                triggerPortal("Projects Showcase", "Inside this hub live standard-shattering builds, active GitHub repos, and direct live links to live web designs.", k.vec2(0, 100));
-            });
-
-            player.onCollide("contact", () => {
-                triggerPortal("Contact & Connect", "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.", k.vec2(0, -100));
-            });
-
-            // Prevent player from walking off the screen bounds
-            player.onUpdate(() => {
-                if (player.pos.x < 15) player.pos.x = 15;
-                if (player.pos.x > k.width() - 55) player.pos.x = k.width() - 55;
-                if (player.pos.y < 15) player.pos.y = 15;
-                if (player.pos.y > k.height() - 55) player.pos.y = k.height() - 55;
-            });
-
-            // Globally accessible function to restore game controls
+            // Connect window listeners to globally close the modal
             window.closeModal = function() {
                 document.getElementById("modal").style.display = "none";
-                controlsActive = true;
+                modalActive = false;
             }
 
-            // Keyboard Exit Listeners (For both Space and Escape keys)
             window.addEventListener("keydown", (e) => {
-                const modal = document.getElementById("modal");
-                // Check if modal is visible
-                if (modal.style.display === "block") {
-                    if (e.key === " " || e.code === "Space" || e.key === "Escape") {
-                        e.preventDefault(); // Prevents default browser scroll on Space
-                        closeModal();
-                    }
+                if (modalActive && (e.key === " " || e.code === "Space" || e.key === "Escape")) {
+                    e.preventDefault();
+                    closeModal();
                 }
             });
         });
 
-        // Launch Game
         k.go("main");
     </script>
 </body>
