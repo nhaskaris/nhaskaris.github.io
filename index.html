@@ -4,12 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nick Haskaris</title>
+  <meta name="description" content="Nick Haskaris - portfolio. Walk the hallway to explore work history, projects and contact info." />
+  <meta property="og:title" content="Nick Haskaris" />
+  <meta property="og:description" content="Portfolio of Nick Haskaris - walk the hallway to explore work history, projects and contact info." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#050508" />
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght=500;700;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap"
     rel="stylesheet"
   />
-  <link rel="icon" href="data:," />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%23050508%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2722%27 text-anchor=%27middle%27 font-family=%27monospace%27 font-weight=%27bold%27 fill=%27%2300e5ff%27%3EN%3C/text%3E%3C/svg%3E" />
 
   <style>
     :root {
@@ -19,7 +24,7 @@
       --dark-bg: #050508;
       --card-bg: rgba(15, 15, 20, 0.92);
       --border-color: #1a1a26;
-      --text-dim: #6a6a85;
+      --text-dim: #9a9ab5;
     }
 
     * {
@@ -38,6 +43,7 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      height: 100dvh;
       gap: 18px;
     }
 
@@ -217,6 +223,65 @@
       font-size: 0.85rem;
       color: var(--text-dim);
       letter-spacing: 1.5px;
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    /* On-screen controls for touch devices */
+    .touch-controls {
+      display: none;
+      gap: 12px;
+    }
+
+    .touch-controls button {
+      background: transparent;
+      border: 2px solid var(--neon-blue);
+      color: var(--neon-blue);
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 18px;
+      border-radius: 6px;
+      min-width: 56px;
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    .touch-controls button:active {
+      background: var(--neon-blue);
+      color: #050508;
+    }
+
+    @media (pointer: coarse) {
+      .touch-controls {
+        display: flex;
+      }
+      .keyboard-hint {
+        display: none;
+      }
+    }
+
+    .room-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .room-links a {
+      color: inherit;
+      border: 1px solid currentColor;
+      border-radius: 6px;
+      padding: 8px 16px;
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .room-links a:hover,
+    .room-links a:focus-visible {
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -232,7 +297,7 @@
     }
   </style>
 
-  <script src="https://unpkg.com/kaplay@3001.0.12/dist/kaplay.js" crossorigin="anonymous"></script>
+  <script src="kaplay.js"></script>
 </head>
 <body>
   <h1 class="site-title">NICK <span>HASKARIS</span></h1>
@@ -241,18 +306,27 @@
     <div class="scanlines"></div>
   </div>
 
-  <div class="footer-hint">PORTFOLIO 3D ALPHA &mdash; USE ARROWS / A·D TO AIM, SPACE TO ENTER</div>
+  <div class="footer-hint">
+    <span class="keyboard-hint">PORTFOLIO ALPHA &mdash; ARROWS / A·D TO AIM, SPACE OR CLICK TO ENTER</span>
+  </div>
+
+  <div class="touch-controls" aria-label="Game controls">
+    <button type="button" id="btn-prev" aria-label="Previous door">&larr;</button>
+    <button type="button" id="btn-enter" aria-label="Enter door">ENTER</button>
+    <button type="button" id="btn-next" aria-label="Next door">&rarr;</button>
+  </div>
 
   <!-- Flash overlay for the moment you step through a door -->
   <div id="room-flash" class="room-flash"></div>
 
   <!-- Themed 'room' you arrive in after walking through a door -->
-  <div id="room-panel" class="room-panel">
+  <div id="room-panel" class="room-panel" role="dialog" aria-modal="true" aria-labelledby="room-title">
     <div class="room-panel-inner">
       <div class="room-icon" id="room-icon">🚪</div>
       <h2 id="room-title">Room</h2>
       <div class="construction-tag">🚧 UNDER CONSTRUCTION 🚧</div>
       <p id="room-text">Content is being assembled...</p>
+      <div class="room-links" id="room-links"></div>
       <button id="room-back-btn" onclick="closeRoom()">Walk Back [SPACE]</button>
     </div>
   </div>
@@ -306,7 +380,8 @@
         color: k.rgb(0, 255, 102),
         classColor: "#00ff66",
         icon: "✉️",
-        desc: "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. Options will appear here shortly.",
+        desc: "Want to start a co-op quest? Dispatch an email or interface directly via LinkedIn and socials. More options will appear here shortly.",
+        links: [{ label: "GitHub", href: "https://github.com/nhaskaris" }],
       },
     ];
 
@@ -350,9 +425,13 @@
       const doorScale = DOORS.map((d) => (d.id === selectedIndex ? SCALE_SELECTED : SCALE_IDLE));
       let gridOffset = 0;
 
+      let audioCtx = null;
+
       function playBeep(freq = 400) {
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const ctx = audioCtx;
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
@@ -417,7 +496,20 @@
           btn.style.color = door.classColor;
         };
 
+        const linksNode = document.getElementById("room-links");
+        linksNode.textContent = "";
+        (door.links || []).forEach((l) => {
+          const a = document.createElement("a");
+          a.href = l.href;
+          a.textContent = l.label;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.style.color = door.classColor;
+          linksNode.appendChild(a);
+        });
+
         document.getElementById("room-panel").classList.add("room-panel--visible");
+        btn.focus();
       }
 
       function hideRoomPanel() {
@@ -774,7 +866,7 @@
               pos: k.vec2(door.x, door.y - activeH - 15),
               anchor: "center",
               size: 11,
-              color: k.rgb(100, 100, 120),
+              color: k.rgb(150, 150, 175),
             });
           }
         });
@@ -800,8 +892,28 @@
       k.onKeyPress("space", () => {
         if (!canInput) return;
         if (doorState === "idle") startDoorOpening();
-        else if (doorState === "room") startZoomOut();
       });
+
+      // Click / tap a door to select it; click / tap the selected door to enter
+      k.onClick(() => {
+        if (doorState !== "idle" || !canInput) return;
+        const m = k.mousePos();
+        const hit = DOORS.find(
+          (d) => Math.abs(m.x - d.x) <= d.w * 0.65 && m.y <= d.y + 20 && m.y >= d.y - d.h * 1.2
+        );
+        if (!hit) return;
+        if (hit.id === selectedIndex) startDoorOpening();
+        else {
+          selectedIndex = hit.id;
+          playBeep();
+        }
+      });
+
+      document.getElementById("btn-prev").onclick = selectPrev;
+      document.getElementById("btn-next").onclick = selectNext;
+      document.getElementById("btn-enter").onclick = () => {
+        if (canInput && doorState === "idle") startDoorOpening();
+      };
 
       window.closeRoom = function () {
         if (doorState === "room") startZoomOut();
